@@ -6,12 +6,13 @@ DATABASE_NAME = "business_orders.db"
 
 
 def initialize_database():
-    """Create the SQLite database if it does not exist."""
+    """Create the SQLite database and orders table."""
     with sqlite3.connect(DATABASE_NAME) as connection:
         connection.execute("""
             CREATE TABLE IF NOT EXISTS orders (
                 order_id TEXT,
                 customer TEXT,
+                order_date TEXT,
                 expected_delivery_date TEXT,
                 status TEXT,
                 order_value REAL
@@ -20,10 +21,20 @@ def initialize_database():
 
 
 def save_orders(orders):
-    """Save uploaded business orders to SQLite."""
+    """Save uploaded orders while preserving their columns."""
+    if orders.empty:
+        raise ValueError("The uploaded dataset contains no orders.")
+
+    clean_orders = orders.copy()
+
+    # Remove an exported DataFrame index if one is present.
+    if "index" in clean_orders.columns:
+        clean_orders = clean_orders.drop(columns=["index"])
+
     required_columns = [
         "order_id",
         "customer",
+        "order_date",
         "expected_delivery_date",
         "status",
         "order_value"
@@ -31,7 +42,7 @@ def save_orders(orders):
 
     missing = [
         column for column in required_columns
-        if column not in orders.columns
+        if column not in clean_orders.columns
     ]
 
     if missing:
@@ -39,9 +50,9 @@ def save_orders(orders):
             f"Missing required columns: {', '.join(missing)}"
         )
 
-    # Store the uploaded records in the database.
+    # Store all columns, not only the required columns.
     with sqlite3.connect(DATABASE_NAME) as connection:
-        orders.to_sql(
+        clean_orders.to_sql(
             "orders",
             connection,
             if_exists="replace",
@@ -50,7 +61,7 @@ def save_orders(orders):
 
 
 def load_orders():
-    """Retrieve saved business orders using SQL."""
+    """Retrieve all saved orders using SQL."""
     with sqlite3.connect(DATABASE_NAME) as connection:
         return pd.read_sql_query(
             "SELECT * FROM orders",
@@ -59,7 +70,7 @@ def load_orders():
 
 
 def get_order_count():
-    """Count saved orders using an SQL query."""
+    """Count saved orders using SQL."""
     with sqlite3.connect(DATABASE_NAME) as connection:
         result = connection.execute(
             "SELECT COUNT(*) FROM orders"

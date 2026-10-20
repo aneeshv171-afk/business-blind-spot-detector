@@ -198,6 +198,9 @@ if uploaded_file is not None:
         save_orders(df)
         st.success(f"SQLite database contains {get_order_count()} orders.")
 
+        db_orders = load_orders()
+st.write("Orders retrieved from SQLite:", len(db_orders))
+
         st.subheader("3. Business Blind Spots")
 
         findings, data_issues = detect_overdue_orders(df)

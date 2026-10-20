@@ -491,6 +491,55 @@ if uploaded_file is not None:
                         hide_index=True
                     )
 
+                        # Compare categories by sales or revenue
+            st.markdown("### Sales and Revenue by Category")
+
+            value_aliases = [
+                "revenue", "sales", "total_sales",
+                "sales_amount", "order_value", "amount"
+            ]
+
+            value_lookup = {
+                str(col).strip().lower().replace(" ", "_"): col
+                for col in df.columns
+            }
+
+            value_col = next(
+                (
+                    value_lookup[name]
+                    for name in value_aliases
+                    if name in value_lookup
+                    and pd.api.types.is_numeric_dtype(df[value_lookup[name]])
+                ),
+                None
+            )
+
+            if value_col is not None:
+                for col in categorical_cols:
+                    if 2 <= df[col].nunique(dropna=True) <= 30:
+                        value_summary = (
+                            df.groupby(col, dropna=False)[value_col]
+                            .sum()
+                            .sort_values(ascending=False)
+                            .head(10)
+                            .reset_index()
+                        )
+
+                        st.write(
+                            f"**{value_col} by {col}** "
+                            "(highest values first)"
+                        )
+                        st.dataframe(
+                            value_summary,
+                            use_container_width=True,
+                            hide_index=True
+                        )
+            else:
+                st.info(
+                    "No recognised numeric sales or revenue column was "
+                    "found. Category counts are still available above."
+                )
+
 
             
             if findings_list:

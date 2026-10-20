@@ -246,6 +246,15 @@ if uploaded_file is not None:
         st.write("Numeric columns:", profile["numeric_columns"])
         st.write("Text columns:", profile["text_columns"])
         st.write("Potential date columns:", profile["date_columns"])
+        if profile["numeric_columns"]:
+        st.subheader("Automatic Numeric Analysis")
+
+        numeric_summary = df[profile["numeric_columns"]].describe().T
+        numeric_summary = numeric_summary.round(2)
+
+        st.dataframe(numeric_summary, use_container_width=True)
+        else:
+        st.info("No numeric columns were detected in this dataset.")
 
 
         st.success("File uploaded successfully!")

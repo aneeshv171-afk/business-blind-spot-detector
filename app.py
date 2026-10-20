@@ -196,6 +196,8 @@ if uploaded_file is not None:
         st.dataframe(df.head(10), use_container_width=True)
 
         save_orders(df)
+        sql_overdue_orders = get_overdue_orders()
+st.write("Overdue orders retrieved using SQL:", len(sql_overdue_orders))
         st.success(f"SQLite database contains {get_order_count()} orders.")
 
     

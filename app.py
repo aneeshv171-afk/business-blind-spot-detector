@@ -374,6 +374,8 @@ if uploaded_file is not None:
 
         for issue in data_issues:
             st.warning(issue)
+            
+        large_orders = pd.DataFrame()
 
         if len(findings.columns) == 0:
             st.info(

@@ -469,11 +469,11 @@ if uploaded_file is not None:
             if findings_list:
                 findings_df = pd.DataFrame(findings_list)
 
-               st.dataframe(
-                   findings_df,
-                   use_container_width=True,
-                   hide_index=True
-             )
+                st.dataframe(
+                    findings_df,
+                    use_container_width=True,
+                    hide_index=True
+                )
             else:
                 findings_df = pd.DataFrame(
                     columns=["Priority", "Finding", "Recommended Action"]

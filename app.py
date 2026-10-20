@@ -311,11 +311,11 @@ if uploaded_file is not None:
             st.warning(issue)
 
         if len(findings.columns) == 0:
-            st.error(
-                "Analysis could not run. Check that your CSV contains "
-                "all required columns listed below."
-            )
-            st.write(REQUIRED_COLUMNS)
+    st.info(
+        "This CSV does not contain enough recognised order-related "
+        "columns for overdue-order analysis. Generic dataset analysis "
+        "is available above."
+           )
 
         else:
             total_overdue = len(findings)

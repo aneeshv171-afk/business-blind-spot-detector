@@ -118,3 +118,19 @@ def get_high_value_pending_orders(limit=10):
             LIMIT ?
         """
         return pd.read_sql_query(query, connection, params=(limit,))
+
+def get_pending_value_by_customer(limit=10):
+    """Find customers with the highest total pending order value."""
+    with sqlite3.connect(DATABASE_NAME) as connection:
+        query = """
+            SELECT
+                customer,
+                COUNT(*) AS pending_order_count,
+                ROUND(SUM(order_value), 2) AS total_pending_value
+            FROM orders
+            WHERE LOWER(status) = 'pending'
+            GROUP BY customer
+            ORDER BY total_pending_value DESC
+            LIMIT ?
+        """
+        return pd.read_sql_query(query, connection, params=(limit,))

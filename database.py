@@ -99,7 +99,22 @@ def get_order_value_by_status():
                 COUNT(*) AS order_count,
                 ROUND(SUM(order_value), 2) AS total_order_value
             FROM orders
+
+            
             GROUP BY status
             ORDER BY total_order_value DESC
         """
         return pd.read_sql_query(query, connection)
+
+def get_high_value_pending_orders(limit=10):
+    """Retrieve the highest-value pending orders using SQL."""
+    with sqlite3.connect(DATABASE_NAME) as connection:
+        query = """
+            SELECT order_id, customer, expected_delivery_date,
+                   status, order_value
+            FROM orders
+            WHERE LOWER(status) = 'pending'
+            ORDER BY order_value DESC
+            LIMIT ?
+        """
+        return pd.read_sql_query(query, connection, params=(limit,))

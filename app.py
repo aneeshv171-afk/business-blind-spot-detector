@@ -273,7 +273,67 @@ if uploaded_file is not None:
         else:
             st.info("No numeric columns were detected in this dataset.")
 
-        st.success("File uploaded successfully!")
+        
+        # Automatic Business Insights
+        st.subheader("Automatic Business Insights")
+
+        column_lookup = {str(col).lower(): col for col in df.columns}
+
+        revenue_col = next(
+            (column_lookup[name] for name in ["revenue", "sales", "total_sales", "sales_amount"]
+             if name in column_lookup),
+            None
+        )
+        product_col = next(
+            (column_lookup[name] for name in ["product", "product_name", "item", "category"]
+             if name in column_lookup),
+            None
+        )
+        region_col = next(
+            (column_lookup[name] for name in ["region", "location", "area", "territory"]
+             if name in column_lookup),
+            None
+        )
+        quantity_col = next(
+            (column_lookup[name] for name in ["units_sold", "quantity", "qty", "units"]
+             if name in column_lookup),
+            None
+        )
+
+        if revenue_col and pd.api.types.is_numeric_dtype(df[revenue_col]):
+            st.metric("Total Revenue / Sales", f"{df[revenue_col].sum():,.2f}")
+
+            if product_col:
+                product_summary = (
+                    df.groupby(product_col, dropna=False)[revenue_col]
+                    .sum()
+                    .sort_values(ascending=False)
+                    .head(5)
+                    .reset_index()
+                )
+                st.write("Top 5 products or categories by revenue")
+                st.dataframe(product_summary, use_container_width=True)
+
+            if region_col:
+                region_summary = (
+                    df.groupby(region_col, dropna=False)[revenue_col]
+                    .sum()
+                    .sort_values(ascending=False)
+                    .head(5)
+                    .reset_index()
+                )
+                st.write("Top 5 regions by revenue")
+                st.dataframe(region_summary, use_container_width=True)
+
+        if quantity_col and pd.api.types.is_numeric_dtype(df[quantity_col]):
+            st.metric("Total Units / Quantity", f"{df[quantity_col].sum():,.2f}")
+
+        if not revenue_col and not quantity_col:
+            st.info(
+                "No recognised revenue, sales, or quantity column was found. "
+                "Use the dataset profile and numeric analysis above to explore this dataset."
+            )
+                 st.success("File uploaded successfully!")
 
 
         # Check for duplicate order IDs

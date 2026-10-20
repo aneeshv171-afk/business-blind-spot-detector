@@ -370,10 +370,14 @@ if uploaded_file is not None:
 
         st.subheader("3. Business Blind Spots")
 
-        findings, data_issues = detect_overdue_orders(df)
+        if all(col in df.columns for col in REQUIRED_COLUMNS):
+            findings, data_issues = detect_overdue_orders(df)
 
-        for issue in data_issues:
-            st.warning(issue)
+            for issue in data_issues:
+                st.warning(issue)
+        else:
+            findings = pd.DataFrame()
+            data_issues = []
             
         large_orders = pd.DataFrame()
 

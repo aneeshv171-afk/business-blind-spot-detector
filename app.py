@@ -246,7 +246,7 @@ if uploaded_file is not None:
         st.write("Numeric columns:", profile["numeric_columns"])
         st.write("Text columns:", profile["text_columns"])
         st.write("Potential date columns:", profile["date_columns"])
-        if profile["numeric_columns"]:
+if profile["numeric_columns"]:
         st.subheader("Automatic Numeric Analysis")
 
         numeric_summary = df[profile["numeric_columns"]].describe().T

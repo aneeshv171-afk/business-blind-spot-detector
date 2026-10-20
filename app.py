@@ -209,8 +209,8 @@ if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
 
         
-      # Standardize column names and recognise common aliases
-      df = standardize_columns(df)
+        # Standardize column names and recognise common aliases
+        df = standardize_columns(df)
 
 
         st.success("File uploaded successfully!")

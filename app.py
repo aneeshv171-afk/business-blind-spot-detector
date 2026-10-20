@@ -466,8 +466,8 @@ if uploaded_file is not None:
                                 )
                             })
 
-           if findings_list:
-               findings_df = pd.DataFrame(findings_list)
+            if findings_list:
+                findings_df = pd.DataFrame(findings_list)
 
                st.dataframe(
                    findings_df,

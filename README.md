@@ -47,6 +47,20 @@ The application uses SQL queries to generate four types of insights:
 - GitHub
 - Streamlit Community Cloud
 
+  ## Application Screenshots
+
+### 1. Analytics Dashboard
+![Analytics Dashboard](Screenshot%202026-10-20%20123536.png)
+
+### 2. SQL Analysis and Customer Insights
+![SQL Analysis](Screenshot%202026-10-20%20123558.png)
+
+### 3. Recommended Actions
+![Recommended Actions](Screenshot%202026-10-20%20123633.png)
+
+### 4. Findings and Downloadable Report
+![Findings and Downloadable Report](Screenshot%202026-10-20%20123645.png)
+
 ## Dataset Requirements
 
 The uploaded CSV should contain these columns:

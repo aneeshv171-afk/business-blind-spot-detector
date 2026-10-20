@@ -65,6 +65,27 @@ def standardize_columns(df):
                 break
 
     return df.rename(columns=rename_map)
+    
+def profile_dataset(df):
+    """Generate a general-purpose profile for any tabular dataset."""
+    profile = {
+        "rows": len(df),
+        "columns": len(df.columns),
+        "missing_values": int(df.isna().sum().sum()),
+        "duplicate_rows": int(df.duplicated().sum()),
+        "numeric_columns": df.select_dtypes(include="number").columns.tolist(),
+        "text_columns": df.select_dtypes(include=["object", "string", "category"]).columns.tolist(),
+        "date_columns": [],
+    }
+
+    # Identify columns that appear to contain dates.
+    for column in df.columns:
+        name = str(column).lower()
+        if any(word in name for word in ["date", "time", "created", "updated"]):
+            profile["date_columns"].append(column)
+
+    return profile
+
 
 def detect_overdue_orders(orders, today=None):
     """Identify pending orders whose delivery deadlines have passed."""

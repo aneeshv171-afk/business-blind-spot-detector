@@ -220,6 +220,12 @@ if uploaded_file is not None:
             sql_overdue_orders = get_overdue_orders()
             st.write("Overdue orders retrieved using SQL:", len(sql_overdue_orders))
 
+            # SQL Analysis: Order Value by Status
+            st.subheader("SQL Analysis: Order Value by Status")
+
+            status_summary = get_order_value_by_status()
+            st.dataframe(status_summary, use_container_width=True)
+
             
             # Business health summary
             total_orders = len(df)

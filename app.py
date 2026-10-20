@@ -347,6 +347,53 @@ if uploaded_file is not None:
         st.subheader("Automatic Dataset Detection")
         st.info(f"Detected dataset type: **{detected_type}**")
 
+        
+        # Automatic Business Insights
+        st.subheader("Automatic Business Insights")
+        
+        if detected_type == "Sales / Revenue":
+        st.write("Sales dataset detected. Checking sales performance.")
+        
+        for col in df.select_dtypes(include="number").columns:
+            total = df[col].sum()
+            average = df[col].mean()
+        
+            st.write(
+                f"**{col}** — Total: {total:,.2f} | "
+                f"Average: {average:,.2f}"
+            )
+        
+        elif detected_type == "Inventory / Stock":
+        st.write(
+            "Inventory dataset detected. "
+            "Review stock levels and identify items needing attention."
+        )
+        
+        elif detected_type == "Employee / HR":
+        st.write(
+            "Employee dataset detected. "
+            "Review workforce distribution and numeric measures."
+        )
+        
+        elif detected_type == "Customer / Marketing":
+        st.write(
+            "Customer or marketing dataset detected. "
+            "Review customer patterns and campaign measures."
+        )
+        
+        elif detected_type == "Orders / Operations":
+        st.write(
+            "Orders dataset detected. "
+            "Review order statuses, delivery dates, and pending orders."
+        )
+        
+        else:
+        st.write(
+            "General dataset detected. "
+            "Use the automatic numeric analysis and data quality checks below."
+        )
+
+
   
 
         st.subheader("Automatic Dataset Profile")

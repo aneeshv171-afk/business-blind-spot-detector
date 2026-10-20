@@ -232,6 +232,20 @@ if uploaded_file is not None:
         
         # Standardize column names and recognise common aliases
         df = standardize_columns(df)
+        profile = profile_dataset(df)
+
+        st.subheader("Automatic Dataset Profile")
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        col1.metric("Rows", profile["rows"])
+        col2.metric("Columns", profile["columns"])
+        col3.metric("Missing Values", profile["missing_values"])
+        col4.metric("Duplicate Rows", profile["duplicate_rows"])
+
+        st.write("Numeric columns:", profile["numeric_columns"])
+        st.write("Text columns:", profile["text_columns"])
+        st.write("Potential date columns:", profile["date_columns"])
 
 
         st.success("File uploaded successfully!")

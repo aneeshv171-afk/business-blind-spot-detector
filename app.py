@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import date
-from database import initialize_database, save_orders, load_orders, get_order_count, get_overdue_orders, get_order_value_by_status, get_high_value_pending_orders
+from database import initialize_database, save_orders, load_orders, get_order_count, get_overdue_orders, get_order_value_by_status, get_high_value_pending_orders, get_pending_value_by_customer
 initialize_database()
 st.set_page_config(
     page_title="Business Blind-Spot Detector",

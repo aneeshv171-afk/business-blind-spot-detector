@@ -216,6 +216,9 @@ if uploaded_file is not None:
 
         else:
             total_overdue = len(findings)
+            
+            sql_overdue_orders = get_overdue_orders()
+            st.write("Overdue orders retrieved using SQL:", len(sql_overdue_orders))
 
             
             # Business health summary

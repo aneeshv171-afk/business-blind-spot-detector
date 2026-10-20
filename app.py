@@ -369,7 +369,7 @@ if uploaded_file is not None:
     
 
         st.subheader("3. Business Blind Spots")
-                if not all(col in df.columns for col in REQUIRED_COLUMNS):
+         if not all(col in df.columns for col in REQUIRED_COLUMNS):
             st.subheader("Universal Business Findings")
 
             findings_list = []

@@ -232,6 +232,12 @@ if uploaded_file is not None:
             high_value_pending = get_high_value_pending_orders()
             st.dataframe(high_value_pending, use_container_width=True)
 
+            # SQL Analysis: Customers with Highest Pending Value
+            st.subheader("SQL Analysis: Customers with Highest Pending Value")
+
+            customer_pending_summary = get_pending_value_by_customer()
+            st.dataframe(customer_pending_summary, use_container_width=True)
+
             
             # Business health summary
             total_orders = len(df)

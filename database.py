@@ -73,6 +73,18 @@ def get_order_count():
     """Count saved orders using SQL."""
     with sqlite3.connect(DATABASE_NAME) as connection:
         result = connection.execute(
+
+            def get_overdue_orders():
+    """Retrieve overdue orders directly using SQL."""
+    with sqlite3.connect(DATABASE_NAME) as connection:
+        query = """
+            SELECT *
+            FROM orders
+            WHERE LOWER(status) NOT IN ('delivered', 'cancelled')
+              AND date(expected_delivery_date) < date('now')
+            ORDER BY date(expected_delivery_date) ASC
+        """
+        return pd.read_sql_query(query, connection)
             "SELECT COUNT(*) FROM orders"
         ).fetchone()
 

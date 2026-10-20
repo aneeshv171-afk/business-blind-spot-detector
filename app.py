@@ -253,6 +253,11 @@ if uploaded_file is not None:
             numeric_summary = numeric_summary.round(2)
 
             st.dataframe(numeric_summary, use_container_width=True)
+                        st.subheader("Automatic Data Visualizations")
+
+            for column in profile["numeric_columns"][:4]:
+                st.write(f"Distribution of {column}")
+                st.bar_chart(df[column].dropna().reset_index(drop=True))
         else:
             st.info("No numeric columns were detected in this dataset.")
 

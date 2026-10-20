@@ -195,6 +195,8 @@ if uploaded_file is not None:
         st.subheader("2. Preview Business Records")
         st.dataframe(df.head(10), use_container_width=True)
 
+        save_orders(df)
+
         st.subheader("3. Business Blind Spots")
 
         findings, data_issues = detect_overdue_orders(df)

@@ -17,30 +17,81 @@ REQUIRED_COLUMNS = [
     "order_value"
 ]
 
+
 COLUMN_ALIASES = {
-    "order_id": ["order_id", "orderid", "order_number", "order_no"],
-    "customer": ["customer", "customer_name", "client", "buyer"],
-    "order_date": ["order_date", "date", "purchase_date"],
+    "order_id": [
+        "order_id", "orderid", "order_number", "order_no",
+        "invoice_id", "invoice_number", "transaction_id",
+        "reference_number", "id"
+    ],
+    "customer": [
+        "customer", "customer_name", "client", "buyer",
+        "client_name", "customer_id", "account_name"
+    ],
+    "order_date": [
+        "order_date", "date", "purchase_date",
+        "transaction_date", "sales_date", "invoice_date",
+        "created_at", "booking_date"
+    ],
     "expected_delivery_date": [
-        "expected_delivery_date",
-        "delivery_due",
-        "due_date",
-        "delivery_date",
+        "expected_delivery_date", "delivery_due",
+        "due_date", "delivery_date", "expected_date",
+        "promised_delivery_date"
     ],
-    "status": ["status", "order_status", "delivery_status"],
+    "status": [
+        "status", "order_status", "delivery_status",
+        "payment_status", "shipment_status"
+    ],
     "order_value": [
-        "order_value",
-        "sales_amount",
-        "revenue",
-        "total_sales",
-        "amount",
+        "order_value", "sales_amount", "revenue",
+        "total_sales", "amount", "net_sales",
+        "turnover", "total_amount", "invoice_amount",
+        "total_revenue", "gross_sales"
     ],
-    "product": ["product", "product_name", "item", "item_name"],
-    "region": ["region", "location", "area", "territory"],
-    "quantity": ["quantity", "qty", "units_sold", "units"],
-    "price": ["price", "unit_price", "selling_price"],
-    "marketing_spend": ["marketing_spend", "ad_spend", "advertising_cost"],
+    "product": [
+        "product", "product_name", "item", "item_name",
+        "product_title", "sku_name", "product_category",
+        "category", "description"
+    ],
+    "region": [
+        "region", "location", "area", "territory",
+        "branch", "branch_name", "city", "state",
+        "district", "country", "sales_region"
+    ],
+    "quantity": [
+        "quantity", "qty", "units_sold", "units",
+        "unit_sold", "sales_quantity", "volume",
+        "number_of_items"
+    ],
+    "price": [
+        "price", "unit_price", "selling_price",
+        "sale_price", "product_price", "average_price"
+    ],
+    "marketing_spend": [
+        "marketing_spend", "ad_spend", "advertising_cost",
+        "marketing_cost", "campaign_spend", "ad_cost"
+    ],
+    "profit": [
+        "profit", "net_profit", "gross_profit",
+        "profit_amount", "earnings"
+    ],
+    "cost": [
+        "cost", "unit_cost", "product_cost",
+        "cost_price", "total_cost", "expenses"
+    ],
+    "employee": [
+        "employee", "employee_name", "staff",
+        "staff_name", "employee_id", "worker"
+    ],
+    "department": [
+        "department", "team", "division", "business_unit"
+    ],
+    "salary": [
+        "salary", "annual_salary", "monthly_salary",
+        "wage", "pay", "compensation"
+    ]
 }
+
 
 def standardize_columns(df):
     """Recognise common column names and standardise them."""

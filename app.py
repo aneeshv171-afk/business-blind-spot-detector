@@ -289,9 +289,63 @@ if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
 
         
-        # Standardize column names and recognise common aliases
-        df = standardize_columns(df)
-        profile = profile_dataset(df)
+# Standardize column names and recognise common aliases
+df = standardize_columns(df)
+profile = profile_dataset(df)
+
+# Automatically identify the dataset type
+column_names = [str(col).lower() for col in df.columns]
+
+dataset_types = {
+    "Sales / Revenue": [
+        "revenue", "sales", "sales_amount", "order_value",
+        "price", "quantity", "units_sold"
+    ],
+    "Inventory / Stock": [
+        "stock", "inventory", "warehouse", "reorder_level",
+        "available_quantity", "stock_quantity"
+    ],
+    "Employee / HR": [
+        "employee", "employee_id", "salary", "department",
+        "designation", "performance_rating"
+    ],
+    "Customer / Marketing": [
+        "customer", "customer_id", "marketing_spend",
+        "campaign", "conversion_rate", "lead_source"
+    ],
+    "Orders / Operations": [
+        "order_id", "order_date", "expected_delivery_date",
+        "delivery_date", "order_status", "status"
+    ],
+}
+
+type_scores = {
+    dataset_type: sum(
+        1 for keyword in keywords
+        if any(keyword in column for column in column_names)
+    )
+    for dataset_type, keywords in dataset_types.items()
+}
+
+best_type = max(type_scores, key=type_scores.get)
+
+if type_scores[best_type] == 0:
+    detected_type = "General / Other Dataset"
+else:
+    highest_score = type_scores[best_type]
+    matching_types = [
+        name for name, score in type_scores.items()
+        if score == highest_score
+    ]
+
+    detected_type = (
+        matching_types[0]
+        if len(matching_types) == 1
+        else "Mixed Business Dataset"
+    )
+
+st.subheader("Automatic Dataset Detection")
+st.info(f"Detected dataset type: **{detected_type}**")
 
         st.subheader("Automatic Dataset Profile")
 

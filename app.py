@@ -246,6 +246,17 @@ if uploaded_file is not None:
         st.write("Numeric columns:", profile["numeric_columns"])
         st.write("Text columns:", profile["text_columns"])
         st.write("Potential date columns:", profile["date_columns"])
+        st.subheader("Data Quality Checks")
+
+        quality_results = pd.DataFrame({
+        "Column": df.columns,
+        "Data Type": df.dtypes.astype(str).values,
+        "Missing Values": df.isna().sum().values,
+        "Missing (%)": (df.isna().mean().values * 100).round(2),
+        "Unique Values": df.nunique().values,
+        })
+
+        st.dataframe(quality_results, use_container_width=True)
         if profile["numeric_columns"]:
             st.subheader("Automatic Numeric Analysis")
 

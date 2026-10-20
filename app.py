@@ -226,6 +226,12 @@ if uploaded_file is not None:
             status_summary = get_order_value_by_status()
             st.dataframe(status_summary, use_container_width=True)
 
+            # SQL Analysis: Highest-Value Pending Orders
+            st.subheader("SQL Analysis: Highest-Value Pending Orders")
+
+            high_value_pending = get_high_value_pending_orders()
+            st.dataframe(high_value_pending, use_container_width=True)
+
             
             # Business health summary
             total_orders = len(df)

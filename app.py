@@ -466,26 +466,30 @@ if uploaded_file is not None:
                                 )
                             })
 
-            if findings_list:
-                findings_df = pd.DataFrame(findings_list)
+           if findings_list:
+               findings_df = pd.DataFrame(findings_list)
 
-                st.dataframe(
-                    findings_df,
-                    use_container_width=True,
-                    hide_index=True
-                )
-
-                st.download_button(
-                    label="Download Data Quality Findings (CSV)",
-                    data=findings_df.to_csv(index=False),
-                    file_name="universal_business_findings.csv",
-                    mime="text/csv"
-                )
+               st.dataframe(
+                   findings_df,
+                   use_container_width=True,
+                   hide_index=True
+             )
             else:
+                findings_df = pd.DataFrame(
+                    columns=["Priority", "Finding", "Recommended Action"]
+                )
+
                 st.success(
                     "No missing cells, duplicate rows, or qualifying "
                     "numeric outliers were detected."
                 )
+
+            st.download_button(
+                label="Download Data Quality Findings (CSV)",
+                data=findings_df.to_csv(index=False),
+                file_name="universal_business_findings.csv",
+                mime="text/csv"
+            )
 
             st.stop()
 

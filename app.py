@@ -17,6 +17,54 @@ REQUIRED_COLUMNS = [
     "order_value"
 ]
 
+COLUMN_ALIASES = {
+    "order_id": ["order_id", "orderid", "order_number", "order_no"],
+    "customer": ["customer", "customer_name", "client", "buyer"],
+    "order_date": ["order_date", "date", "purchase_date"],
+    "expected_delivery_date": [
+        "expected_delivery_date",
+        "delivery_due",
+        "due_date",
+        "delivery_date",
+    ],
+    "status": ["status", "order_status", "delivery_status"],
+    "order_value": [
+        "order_value",
+        "sales_amount",
+        "revenue",
+        "total_sales",
+        "amount",
+    ],
+    "product": ["product", "product_name", "item", "item_name"],
+    "region": ["region", "location", "area", "territory"],
+    "quantity": ["quantity", "qty", "units_sold", "units"],
+    "price": ["price", "unit_price", "selling_price"],
+    "marketing_spend": ["marketing_spend", "ad_spend", "advertising_cost"],
+}
+
+def standardize_columns(df):
+    """Recognise common column names and standardise them."""
+    df = df.copy()
+
+    # Normalise column names first
+    df.columns = (
+        df.columns.astype(str)
+        .str.strip()
+        .str.lower()
+        .str.replace(r"[\s\-]+", "_", regex=True)
+    )
+
+    rename_map = {}
+    used_columns = set()
+
+    for standard_name, aliases in COLUMN_ALIASES.items():
+        for column in df.columns:
+            if column in aliases and standard_name not in used_columns:
+                rename_map[column] = standard_name
+                used_columns.add(standard_name)
+                break
+
+    return df.rename(columns=rename_map)
 
 def detect_overdue_orders(orders, today=None):
     """Identify pending orders whose delivery deadlines have passed."""
@@ -161,13 +209,8 @@ if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
 
         
-        # Standardize column names before analysis
-        df.columns = (
-            df.columns.astype(str)
-            .str.strip()
-            .str.lower()
-            .str.replace(r"[\s\-]+", "_", regex=True)
-        )
+      # Standardize column names and recognise common aliases
+      df = standardize_columns(df)
 
 
         st.success("File uploaded successfully!")

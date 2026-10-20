@@ -280,7 +280,7 @@ if uploaded_file is not None:
         column_lookup = {str(col).lower(): col for col in df.columns}
 
         revenue_col = next(
-            (column_lookup[name] for name in ["revenue", "sales", "total_sales", "sales_amount"]
+            (column_lookup[name] for name in ["revenue", "sales", "total_sales", "sales_amount", "total_revenue", "amount", "order_amount", "selling_price","net_sales", "gross_sales", "total_amount"]
              if name in column_lookup),
             None
         )

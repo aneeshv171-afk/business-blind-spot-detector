@@ -333,7 +333,7 @@ if uploaded_file is not None:
                 "No recognised revenue, sales, or quantity column was found. "
                 "Use the dataset profile and numeric analysis above to explore this dataset."
             )
-                 st.success("File uploaded successfully!")
+        st.success("File uploaded successfully!")
 
 
         # Check for duplicate order IDs

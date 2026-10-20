@@ -466,6 +466,33 @@ if uploaded_file is not None:
                                 )
                             })
 
+                        # Analyse categorical columns for useful business insights
+            st.markdown("### Category Analysis")
+
+            categorical_cols = df.select_dtypes(
+                include=["object", "category", "string"]
+            ).columns
+
+            for col in categorical_cols:
+                unique_count = df[col].nunique(dropna=True)
+
+                if 2 <= unique_count <= 30:
+                    category_summary = (
+                        df.groupby(col, dropna=False)
+                        .size()
+                        .reset_index(name="Record Count")
+                        .sort_values("Record Count", ascending=False)
+                    )
+
+                    st.write(f"Record distribution by **{col}**")
+                    st.dataframe(
+                        category_summary.head(10),
+                        use_container_width=True,
+                        hide_index=True
+                    )
+
+
+            
             if findings_list:
                 findings_df = pd.DataFrame(findings_list)
 

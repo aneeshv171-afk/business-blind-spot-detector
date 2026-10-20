@@ -196,6 +196,7 @@ if uploaded_file is not None:
         st.dataframe(df.head(10), use_container_width=True)
 
         save_orders(df)
+        st.success(f"SQLite database contains {get_order_count()} orders.")
 
         st.subheader("3. Business Blind Spots")
 

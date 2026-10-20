@@ -358,9 +358,14 @@ if uploaded_file is not None:
         st.subheader("2. Preview Business Records")
         st.dataframe(df.head(10), use_container_width=True)
 
-        save_orders(df)
-        st.success(f"SQLite database contains {get_order_count()} orders.")
-
+        if all(col in df.columns for col in REQUIRED_COLUMNS):
+            save_orders(df)
+            st.success(f"SQLite database contains {get_order_count()} orders.")
+        else:
+            st.info(
+                "This dataset is not compatible with order-specific SQL analysis. "
+                "Generic dataset analysis and Automatic Business Insights remain available."
+            )
     
 
         st.subheader("3. Business Blind Spots")

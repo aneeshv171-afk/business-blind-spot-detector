@@ -351,19 +351,19 @@ if uploaded_file is not None:
         # Automatic Business Insights
         st.subheader("Automatic Business Insights")
         
-        if detected_type == "Sales / Revenue":
-        st.write("Sales dataset detected. Checking sales performance.")
         
+    if detected_type == "Sales / Revenue":
+        st.write("Sales dataset detected. Checking sales performance.")
+
         for col in df.select_dtypes(include="number").columns:
             total = df[col].sum()
             average = df[col].mean()
-        
+
             st.write(
                 f"**{col}** — Total: {total:,.2f} | "
                 f"Average: {average:,.2f}"
             )
-        
-        elif detected_type == "Inventory / Stock":
+    elif detected_type == "Inventory / Stock":
         st.write(
             "Inventory dataset detected. "
             "Review stock levels and identify items needing attention."

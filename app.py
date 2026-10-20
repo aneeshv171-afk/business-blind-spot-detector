@@ -108,9 +108,17 @@ def standardize_columns(df):
     rename_map = {}
     used_columns = set()
 
-    for standard_name, aliases in COLUMN_ALIASES.items():
+        for standard_name, aliases in COLUMN_ALIASES.items():
+        normalized_aliases = {
+            str(alias).strip().lower().replace(" ", "_").replace("-", "_")
+            for alias in aliases
+        }
+
         for column in df.columns:
-            if column in aliases and standard_name not in used_columns:
+            if (
+                column in normalized_aliases
+                and standard_name not in used_columns
+            ):
                 rename_map[column] = standard_name
                 used_columns.add(standard_name)
                 break

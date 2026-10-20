@@ -372,60 +372,120 @@ if uploaded_file is not None:
         if not all(col in df.columns for col in REQUIRED_COLUMNS):
             st.subheader("Universal Business Findings")
 
-            findings_list = []
-
-            # Check overall data quality
-            missing_cells = int(df.isna().sum().sum())
-            duplicate_rows = int(df.duplicated().sum())
-
-            if missing_cells > 0:
-                findings_list.append({
-                    "Priority": "Medium",
-                    "Finding": f"{missing_cells} missing cell(s) detected.",
-                    "Recommended Action": "Review missing values before making business decisions."
-                })
-
-            if duplicate_rows > 0:
-                findings_list.append({
-                    "Priority": "Medium",
-                    "Finding": f"{duplicate_rows} duplicate row(s) detected.",
-                    "Recommended Action": "Check whether duplicate records should be removed."
-                })
-
-            # Summarise numeric columns
+                        # Dataset Summary: descriptive statistics, not findings
+            st.markdown("### Dataset Summary")
             numeric_cols = df.select_dtypes(include="number").columns
 
-            for col in numeric_cols:
-                if df[col].notna().sum() > 0:
-                    findings_list.append({
-                        "Priority": "Low",
-                        "Finding": (
-                            f"{col}: total = {df[col].sum():,.2f}, "
-                            f"average = {df[col].mean():,.2f}."
-                        ),
-                        "Recommended Action": (
-                            f"Review the distribution and business meaning of {col}."
-                        )
-                    })
+            if len(numeric_cols) > 0:
+                summary_rows = []
 
-            if findings_list:
+                for col in numeric_cols:
+                    values = df[col].dropna()
+                    if not values.empty:
+                        summary_rows.append({
+                            "Column": col,
+                            "Count": int(values.count()),
+                            "Total": round(float(values.sum()), 2),
+                            "Average": round(float(values.mean()), 2),
+                            "Minimum": round(float(values.min()), 2),
+                            "Maximum": round(float(values.max()), 2)
+                        })
+
                 st.dataframe(
-                    pd.DataFrame(findings_list),
+                    pd.DataFrame(summary_rows),
                     use_container_width=True,
                     hide_index=True
                 )
             else:
-                st.info(
-                    "No basic data-quality issues or numeric measures "
-                    "were identified. Review the dataset profile above."
+                st.info("No numeric columns were found in this dataset.")
+
+            # Findings: only report detected issues
+            st.markdown("### Data Quality Findings")
+            findings_list = []
+
+            missing_cells = int(df.isna().sum().sum())
+            duplicate_rows = int(df.duplicated().sum())
+
+            if missing_cells > 0:
+                missing_rate = missing_cells / max(df.size, 1) * 100
+                priority = "High" if missing_rate >= 20 else "Medium"
+
+                findings_list.append({
+                    "Priority": priority,
+                    "Finding": (
+                        f"{missing_cells} missing cell(s) detected "
+                        f"({missing_rate:.1f}% of all cells)."
+                    ),
+                    "Recommended Action": (
+                        "Review missing values and decide whether to fill, "
+                        "correct, or exclude affected records."
+                    )
+                })
+
+            if duplicate_rows > 0:
+                duplicate_rate = duplicate_rows / max(len(df), 1) * 100
+                priority = "High" if duplicate_rate >= 20 else "Medium"
+
+                findings_list.append({
+                    "Priority": priority,
+                    "Finding": (
+                        f"{duplicate_rows} duplicate row(s) detected "
+                        f"({duplicate_rate:.1f}% of rows)."
+                    ),
+                    "Recommended Action": (
+                        "Inspect duplicate records before removing them; "
+                        "some repeated rows may be legitimate."
+                    )
+                })
+
+            # Flag potential numeric outliers using the IQR rule
+            for col in numeric_cols:
+                values = df[col].dropna()
+
+                if len(values) >= 8 and values.nunique() > 4:
+                    q1 = values.quantile(0.25)
+                    q3 = values.quantile(0.75)
+                    iqr = q3 - q1
+
+                    if iqr > 0:
+                        outlier_count = int(
+                            ((values < q1 - 1.5 * iqr) |
+                             (values > q3 + 1.5 * iqr)).sum()
+                        )
+
+                        if outlier_count > 0:
+                            findings_list.append({
+                                "Priority": "Medium",
+                                "Finding": (
+                                    f"{outlier_count} potential outlier(s) "
+                                    f"found in '{col}' using the IQR rule."
+                                ),
+                                "Recommended Action": (
+                                    "Inspect these values in context. "
+                                    "Outliers are not automatically errors."
+                                )
+                            })
+
+            if findings_list:
+                findings_df = pd.DataFrame(findings_list)
+
+                st.dataframe(
+                    findings_df,
+                    use_container_width=True,
+                    hide_index=True
                 )
 
-            st.download_button(
-                label="Download Universal Findings (CSV)",
-                data=pd.DataFrame(findings_list).to_csv(index=False),
-                file_name="universal_business_findings.csv",
-                mime="text/csv"
-            )
+                st.download_button(
+                    label="Download Data Quality Findings (CSV)",
+                    data=findings_df.to_csv(index=False),
+                    file_name="universal_business_findings.csv",
+                    mime="text/csv"
+                )
+            else:
+                st.success(
+                    "No missing cells, duplicate rows, or qualifying "
+                    "numeric outliers were detected."
+                )
 
             st.stop()
 

@@ -89,3 +89,17 @@ def get_overdue_orders():
             ORDER BY date(expected_delivery_date) ASC
         """
         return pd.read_sql_query(query, connection)
+
+def get_order_value_by_status():
+    """Calculate total order value for each status using SQL."""
+    with sqlite3.connect(DATABASE_NAME) as connection:
+        query = """
+            SELECT
+                status,
+                COUNT(*) AS order_count,
+                ROUND(SUM(order_value), 2) AS total_order_value
+            FROM orders
+            GROUP BY status
+            ORDER BY total_order_value DESC
+        """
+        return pd.read_sql_query(query, connection)

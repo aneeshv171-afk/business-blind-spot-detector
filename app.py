@@ -194,12 +194,7 @@ if uploaded_file is not None:
 
         st.subheader("2. Preview Business Records")
         st.dataframe(df.head(10), use_container_width=True)
-try:
-    save_orders(df)
-    st.success(f"Saved {get_order_count()} orders to SQLite.")
-except Exception as e:
-    st.error(f"Could not save orders to SQLite: {e}")
-    
+
         st.subheader("3. Business Blind Spots")
 
         findings, data_issues = detect_overdue_orders(df)

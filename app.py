@@ -369,6 +369,65 @@ if uploaded_file is not None:
     
 
         st.subheader("3. Business Blind Spots")
+                if not all(col in df.columns for col in REQUIRED_COLUMNS):
+            st.subheader("Universal Business Findings")
+
+            findings_list = []
+
+            # Check overall data quality
+            missing_cells = int(df.isna().sum().sum())
+            duplicate_rows = int(df.duplicated().sum())
+
+            if missing_cells > 0:
+                findings_list.append({
+                    "Priority": "Medium",
+                    "Finding": f"{missing_cells} missing cell(s) detected.",
+                    "Recommended Action": "Review missing values before making business decisions."
+                })
+
+            if duplicate_rows > 0:
+                findings_list.append({
+                    "Priority": "Medium",
+                    "Finding": f"{duplicate_rows} duplicate row(s) detected.",
+                    "Recommended Action": "Check whether duplicate records should be removed."
+                })
+
+            # Summarise numeric columns
+            numeric_cols = df.select_dtypes(include="number").columns
+
+            for col in numeric_cols:
+                if df[col].notna().sum() > 0:
+                    findings_list.append({
+                        "Priority": "Low",
+                        "Finding": (
+                            f"{col}: total = {df[col].sum():,.2f}, "
+                            f"average = {df[col].mean():,.2f}."
+                        ),
+                        "Recommended Action": (
+                            f"Review the distribution and business meaning of {col}."
+                        )
+                    })
+
+            if findings_list:
+                st.dataframe(
+                    pd.DataFrame(findings_list),
+                    use_container_width=True,
+                    hide_index=True
+                )
+            else:
+                st.info(
+                    "No basic data-quality issues or numeric measures "
+                    "were identified. Review the dataset profile above."
+                )
+
+            st.download_button(
+                label="Download Universal Findings (CSV)",
+                data=pd.DataFrame(findings_list).to_csv(index=False),
+                file_name="universal_business_findings.csv",
+                mime="text/csv"
+            )
+
+            st.stop()
 
         if all(col in df.columns for col in REQUIRED_COLUMNS):
             findings, data_issues = detect_overdue_orders(df)

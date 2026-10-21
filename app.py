@@ -469,16 +469,53 @@ if uploaded_file is not None:
                     f"{stock_values.sum(skipna=True):,.0f}",
                 )
 
-                # Use the 25th percentile as a relative low-stock indicator.
-                threshold = stock_values.quantile(0.25)
-
-                low_stock = df.loc[
-                    stock_values.notna() & (stock_values <= threshold)
-                ].copy()
-
-                st.write(
-                    f"**Relative low-stock threshold:** {threshold:,.2f}"
+                
+                reorder_col = next(
+                    (
+                        col for col in df.columns
+                        if "reorder" in col.lower()
+                        and "level" in col.lower()
+                    ),
+                    None,
                 )
+
+                if reorder_col:
+                    reorder_values = pd.to_numeric(
+                        df[reorder_col], errors="coerce"
+                    )
+
+                    low_stock = df.loc[
+                        stock_values.notna()
+                        & reorder_values.notna()
+                        & (stock_values <= reorder_values)
+                    ].copy()
+
+                    threshold = None
+                    st.write(
+                        f"**Reorder-level column detected:** {reorder_col}"
+                    )
+                    st.write(
+                        f"**Products at or below reorder level:** "
+                        f"{len(low_stock)}"
+                    )
+                else:
+                    threshold = stock_values.quantile(0.25)
+
+                    low_stock = df.loc[
+                        stock_values.notna()
+                        & (stock_values <= threshold)
+                    ].copy()
+
+                    st.write(
+                        "No reorder-level column found. Using the "
+                        "relative low-stock threshold instead."
+                    )
+
+
+                if threshold is not None:
+                    st.write(
+                        f"**Relative low-stock threshold:** {threshold:,.2f}"
+                    )
 
                 if not low_stock.empty:
                     st.subheader("Items to Review for Replenishment")

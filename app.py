@@ -403,9 +403,9 @@ if uploaded_file is not None:
 
                     st.subheader("Potentially Low-Selling Products")
 
-                    if len(product_sales) >= 2:
+                    if len(product_sales) >= 4:
                         low_sales = product_sales[
-                            product_sales < product_sales.median()
+                            product_sales <= product_sales.quantile(0.25)
                         ]
 
                         if not low_sales.empty:

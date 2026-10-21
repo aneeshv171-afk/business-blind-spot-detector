@@ -703,6 +703,19 @@ if uploaded_file is not None:
                 use_container_width=True,
             )
 
+            st.subheader("Campaign Comparison")
+
+            chart_metric = st.selectbox(
+                "Choose a metric to compare",
+                ["Marketing_Spend", "Conversions", "Cost_Per_Conversion"],
+            )
+            
+            chart_data = campaign_summary.set_index(campaign_col)[
+                chart_metric
+            ]
+            
+            st.bar_chart(chart_data)
+
             efficient_campaigns = campaign_summary[
                 campaign_summary["Conversions"] > 0
             ]

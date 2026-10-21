@@ -716,6 +716,36 @@ if uploaded_file is not None:
             
             st.bar_chart(chart_data)
 
+            st.subheader("Marketing Recommendations")
+
+            if conversion_col and spend_col:
+                campaign_summary["Cost_Per_Conversion"] = (
+                    campaign_summary["Marketing_Spend"]
+                    / campaign_summary["Conversions"].replace(0, float("nan"))
+                )
+            
+                valid_campaigns = campaign_summary.dropna(
+                    subset=["Cost_Per_Conversion"]
+                )
+            
+                if not valid_campaigns.empty:
+                    average_cost = valid_campaigns["Cost_Per_Conversion"].mean()
+            
+                    for _, row in valid_campaigns.iterrows():
+                        if row["Cost_Per_Conversion"] > average_cost:
+                            st.warning(
+                                f"{row[campaign_col]} has an above-average "
+                                "cost per conversion. Review its targeting "
+                                "and campaign performance."
+                            )
+                        else:
+                            st.success(
+                                f"{row[campaign_col]} has a below-average "
+                                "cost per conversion."
+                            )
+                else:
+                    st.info("Not enough positive conversions to compare campaigns.")
+
             efficient_campaigns = campaign_summary[
                 campaign_summary["Conversions"] > 0
             ]

@@ -709,6 +709,49 @@ if uploaded_file is not None:
         })
 
         st.dataframe(quality_results, use_container_width=True)
+
+        
+        st.subheader("Business Data Health Score")
+
+        total_cells = df.shape[0] * df.shape[1]
+
+        if total_cells > 0:
+            missing_rate = df.isna().sum().sum() / total_cells
+            duplicate_rate = df.duplicated().sum() / max(len(df), 1)
+
+            health_score = round(
+                100 * (
+                    1
+                    - 0.6 * missing_rate
+                    - 0.4 * duplicate_rate
+                )
+            )
+            health_score = max(0, min(100, health_score))
+
+            st.metric("Business Data Health", f"{health_score}/100")
+
+            if health_score >= 90:
+                st.success(
+                    "Excellent data completeness and uniqueness."
+                )
+            elif health_score >= 70:
+                st.info(
+                    "Some data quality issues may need attention."
+                )
+            else:
+                st.warning(
+                    "Review missing values and duplicate rows before "
+                    "relying on the analysis."
+                )
+
+            st.caption(
+                "Score is based on missing-cell rate and duplicate-row rate. "
+                "It does not measure accuracy, and it does not include "
+                "numeric outliers."
+            )
+        else:
+            st.info("The dataset is empty, so a health score cannot be calculated.")
+
         if profile["numeric_columns"]:
             st.subheader("Automatic Numeric Analysis")
 

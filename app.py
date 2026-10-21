@@ -556,11 +556,69 @@ if uploaded_file is not None:
             )
 
         
+        
         elif detected_type == "Customer / Marketing":
-            st.write(
-                "Customer or marketing dataset detected. "
-                "Review customer patterns and campaign measures."
+            st.write("Customer or marketing dataset detected.")
+
+            numeric_cols = df.select_dtypes(include="number").columns.tolist()
+
+            spend_col = next(
+                (
+                    col for col in numeric_cols
+                    if any(word in col.lower() for word in [
+                        "marketing_spend", "ad_spend", "advertising_cost",
+                        "campaign_cost", "marketing_cost", "ad_cost"
+                    ])
+                ),
+                None,
             )
+
+            conversion_col = next(
+                (
+                    col for col in numeric_cols
+                    if any(word in col.lower() for word in [
+                        "conversion", "conversions", "purchases"
+                    ])
+                ),
+                None,
+            )
+
+            if spend_col:
+                spend = pd.to_numeric(df[spend_col], errors="coerce")
+
+                st.metric("Total Marketing Spend", f"{spend.sum():,.2f}")
+                st.metric("Average Marketing Spend", f"{spend.mean():,.2f}")
+
+                if conversion_col:
+                    conversions = pd.to_numeric(
+                        df[conversion_col], errors="coerce"
+                    )
+                    total_conversions = conversions.sum()
+                    total_spend = spend.sum()
+
+                    st.metric("Total Conversions", f"{total_conversions:,.0f}")
+
+                    if total_conversions > 0:
+                        st.metric(
+                            "Cost per Conversion",
+                            f"{total_spend / total_conversions:,.2f}",
+                        )
+                    else:
+                        st.info(
+                            "No positive conversions were recorded, "
+                            "so cost per conversion cannot be calculated."
+                        )
+                else:
+                    st.info(
+                        "No recognisable conversion column was found. "
+                        "Marketing spend was analysed independently."
+                    )
+            else:
+                st.info(
+                    "No recognisable marketing-spend column was found. "
+                    "General dataset analysis remains available."
+                )
+
         
         elif detected_type == "Orders / Operations":
             st.write(

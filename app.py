@@ -435,11 +435,81 @@ if uploaded_file is not None:
             else:
                 st.info("No numeric columns were found for sales analysis.")
 
+        
         elif detected_type == "Inventory / Stock":
-            st.write(
-                "Inventory dataset detected. "
-                "Review stock levels and identify items needing attention."
+            st.write("Inventory dataset detected. Checking stock levels.")
+
+            numeric_cols = df.select_dtypes(include="number").columns.tolist()
+
+            stock_col = next(
+                (
+                    col for col in numeric_cols
+                    if any(word in col.lower() for word in
+                           ["stock_quantity", "stock_qty", "quantity",
+                            "qty", "inventory_level", "units_in_stock"])
+                ),
+                None,
             )
+
+            item_col = next(
+                (
+                    col for col in df.columns
+                    if any(word in col.lower() for word in
+                           ["product", "item", "sku", "product_name"])
+                ),
+                None,
+            )
+
+            if stock_col:
+                stock_values = pd.to_numeric(df[stock_col], errors="coerce")
+
+                st.write(f"**Stock column detected:** {stock_col}")
+                st.metric(
+                    "Total recorded stock",
+                    f"{stock_values.sum(skipna=True):,.0f}",
+                )
+
+                # Use the 25th percentile as a relative low-stock indicator.
+                threshold = stock_values.quantile(0.25)
+
+                low_stock = df.loc[
+                    stock_values.notna() & (stock_values <= threshold)
+                ].copy()
+
+                st.write(
+                    f"**Relative low-stock threshold:** {threshold:,.2f}"
+                )
+
+                if not low_stock.empty:
+                    st.subheader("Items to Review for Replenishment")
+
+                    display_cols = (
+                        [item_col, stock_col]
+                        if item_col and item_col != stock_col
+                        else [stock_col]
+                    )
+
+                    st.dataframe(
+                        low_stock[display_cols].sort_values(
+                            by=stock_col, ascending=True
+                        ),
+                        use_container_width=True,
+                    )
+                else:
+                    st.write("No low-stock items were identified.")
+
+                st.caption(
+                    "This is a relative indicator based on the dataset's "
+                    "lower stock values, not a confirmed reorder requirement. "
+                    "Use reorder points and supplier lead times when available."
+                )
+            else:
+                st.info(
+                    "No recognisable stock-quantity column was found. "
+                    "Look for columns such as quantity, stock_qty, or "
+                    "units_in_stock. Other dataset analyses remain available."
+                )
+
         
         
         elif detected_type == "Employee / HR":

@@ -426,6 +426,47 @@ if uploaded_file is not None:
                         "Low-selling products are flagged relative to the "
                         "dataset median, not as proof of poor performance."
                     )
+                    
+                # Analyse revenue concentration among top products.
+                if len(product_sales) >= 2:
+                    total_sales = product_sales.sum()
+
+                    if total_sales > 0:
+                        top_five_sales = product_sales.head(5).sum()
+                        concentration = (top_five_sales / total_sales) * 100
+
+                        st.subheader("Revenue Concentration")
+
+                        st.metric(
+                            "Sales from Top 5 Products",
+                            f"{concentration:.1f}%"
+                        )
+
+                        if concentration >= 80:
+                            st.warning(
+                                "Revenue is highly concentrated in the top "
+                                "products. Review dependency on these products."
+                            )
+                        elif concentration >= 50:
+                            st.info(
+                                "The top products contribute a substantial "
+                                "share of total sales."
+                            )
+                        else:
+                            st.success(
+                                "Sales are relatively distributed beyond "
+                                "the top products."
+                            )
+
+                        st.caption(
+                            "This measures the share of recorded sales "
+                            "from the top five products, not profit."
+                        )
+
+
+            
+
+                
                 else:
                     st.info(
                         "Product-level analysis requires a recognisable "

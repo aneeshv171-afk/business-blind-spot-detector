@@ -352,17 +352,89 @@ if uploaded_file is not None:
         st.subheader("Automatic Business Insights")
         
         
+        
         if detected_type == "Sales / Revenue":
-            st.write("Sales dataset detected. Checking sales performance.")
-    
-            for col in df.select_dtypes(include="number").columns:
-                total = df[col].sum()
-                average = df[col].mean()
-    
-                st.write(
-                    f"**{col}** — Total: {total:,.2f} | "
-                    f"Average: {average:,.2f}"
+            st.write("Sales dataset detected. Analysing sales performance.")
+
+            numeric_cols = df.select_dtypes(include="number").columns.tolist()
+
+            if numeric_cols:
+                for col in numeric_cols:
+                    total = df[col].sum()
+                    average = df[col].mean()
+
+                    st.write(
+                        f"**{col}** — Total: {total:,.2f} | "
+                        f"Average: {average:,.2f}"
+                    )
+
+                # Identify a likely product column.
+                product_col = next(
+                    (
+                        col for col in df.columns
+                        if any(word in col.lower() for word in
+                               ["product", "item", "product_name", "sku"])
+                    ),
+                    None,
                 )
+
+                # Identify a likely sales or revenue column.
+                sales_col = next(
+                    (
+                        col for col in numeric_cols
+                        if any(word in col.lower() for word in
+                               ["sales", "revenue", "amount", "total"])
+                    ),
+                    None,
+                )
+
+                if product_col and sales_col:
+                    product_sales = (
+                        df.groupby(product_col, dropna=False)[sales_col]
+                        .sum()
+                        .sort_values(ascending=False)
+                    )
+
+                    st.subheader("Top-Performing Products")
+                    st.dataframe(
+                        product_sales.head(5).rename("Total Sales").reset_index(),
+                        use_container_width=True,
+                    )
+
+                    st.subheader("Potentially Low-Selling Products")
+
+                    if len(product_sales) >= 2:
+                        low_sales = product_sales[
+                            product_sales < product_sales.median()
+                        ]
+
+                        if not low_sales.empty:
+                            st.dataframe(
+                                low_sales.rename("Total Sales").reset_index(),
+                                use_container_width=True,
+                            )
+                        else:
+                            st.write(
+                                "No products fall below the median sales value."
+                            )
+                    else:
+                        st.write(
+                            "Not enough distinct products to compare sales."
+                        )
+
+                    st.caption(
+                        "Low-selling products are flagged relative to the "
+                        "dataset median, not as proof of poor performance."
+                    )
+                else:
+                    st.info(
+                        "Product-level analysis requires a recognisable "
+                        "product column and a numeric sales/revenue column. "
+                        "Your numeric summaries are still available above."
+                    )
+            else:
+                st.info("No numeric columns were found for sales analysis.")
+
         elif detected_type == "Inventory / Stock":
             st.write(
                 "Inventory dataset detected. "

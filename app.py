@@ -716,6 +716,50 @@ if uploaded_file is not None:
             numeric_summary = numeric_summary.round(2)
             st.dataframe(numeric_summary, use_container_width=True)
 
+            
+            st.subheader("Business Recommendations")
+
+            recommendations = []
+
+            for col in profile["numeric_columns"]:
+                values = pd.to_numeric(df[col], errors="coerce").dropna()
+
+                if values.empty:
+                    continue
+
+                if values.nunique() <= 1:
+                    recommendations.append(
+                        f"Review '{col}': all available values are identical. "
+                        "Confirm whether this is expected."
+                    )
+                    continue
+
+                average = values.mean()
+                minimum = values.min()
+                maximum = values.max()
+
+                if average > 0 and maximum > average * 2:
+                    recommendations.append(
+                        f"Investigate unusually high values in '{col}'. "
+                        "Check whether they represent genuine activity or data errors."
+                    )
+
+                if average > 0 and minimum < average * 0.5:
+                    recommendations.append(
+                        f"Review unusually low values in '{col}' to determine "
+                        "whether they indicate underperformance or normal variation."
+                    )
+
+            if recommendations:
+                for recommendation in recommendations:
+                    st.write(f"- {recommendation}")
+            else:
+                st.write(
+                    "No obvious numeric patterns requiring review were detected "
+                    "using these basic checks."
+                )
+
+
             st.subheader("Automatic Data Visualizations")
 
             for column in profile["numeric_columns"][:4]:

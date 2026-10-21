@@ -659,6 +659,70 @@ if uploaded_file is not None:
                     "No recognisable marketing-spend column was found. "
                     "General dataset analysis remains available."
                 )
+                
+        # Compare marketing campaign performance when campaign data exists.
+        campaign_col = next(
+            (
+                col for col in df.columns
+                if "campaign" in col.lower()
+            ),
+            None,
+        )
+
+        if campaign_col and spend_col and conversion_col:
+            campaign_data = df.copy()
+
+            campaign_data[spend_col] = pd.to_numeric(
+                campaign_data[spend_col], errors="coerce"
+            )
+            campaign_data[conversion_col] = pd.to_numeric(
+                campaign_data[conversion_col], errors="coerce"
+            )
+
+            campaign_summary = (
+                campaign_data.groupby(campaign_col, dropna=False)
+                .agg(
+                    Marketing_Spend=(spend_col, "sum"),
+                    Conversions=(conversion_col, "sum"),
+                )
+                .reset_index()
+            )
+
+            campaign_summary["Cost_Per_Conversion"] = (
+                campaign_summary["Marketing_Spend"]
+                / campaign_summary["Conversions"].where(
+                    campaign_summary["Conversions"] > 0
+                )
+            )
+
+            st.subheader("Campaign Performance")
+            st.dataframe(
+                campaign_summary.sort_values(
+                    "Cost_Per_Conversion", na_position="last"
+                ).round(2),
+                use_container_width=True,
+            )
+
+            efficient_campaigns = campaign_summary[
+                campaign_summary["Conversions"] > 0
+            ]
+
+            if not efficient_campaigns.empty:
+                best_campaign = efficient_campaigns.loc[
+                    efficient_campaigns["Cost_Per_Conversion"].idxmin()
+                ]
+
+                st.success(
+                    f"Lowest cost per conversion: "
+                    f"{best_campaign[campaign_col]} "
+                    f"({best_campaign['Cost_Per_Conversion']:.2f} per conversion)."
+                )
+        elif campaign_col:
+            st.info(
+                "A campaign column was found, but campaign-level comparison "
+                "requires recognisable marketing-spend and conversion columns."
+            )
+
 
         
         elif detected_type == "Orders / Operations":

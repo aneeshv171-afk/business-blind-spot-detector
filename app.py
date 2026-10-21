@@ -626,11 +626,62 @@ if uploaded_file is not None:
                 "Review order statuses, delivery dates, and pending orders."
             )
             
+        
         else:
             st.write(
-                "General dataset detected. "
-                "Use the automatic numeric analysis and data quality checks below."
+                "General dataset detected. Generating useful findings "
+                "from the available data."
             )
+
+            numeric_cols = df.select_dtypes(include="number").columns.tolist()
+
+            if numeric_cols:
+                st.subheader("Key Numeric Findings")
+
+                numeric_totals = df[numeric_cols].sum(numeric_only=True)
+                numeric_totals = numeric_totals[
+                    numeric_totals.notna()
+                ]
+
+                if not numeric_totals.empty:
+                    highest_total_col = numeric_totals.idxmax()
+
+                    st.write(
+                        f"**Largest numeric total:** {highest_total_col} "
+                        f"({numeric_totals[highest_total_col]:,.2f})"
+                    )
+
+                for col in numeric_cols:
+                    values = pd.to_numeric(df[col], errors="coerce").dropna()
+
+                    if values.empty:
+                        continue
+
+                    average = values.mean()
+                    minimum = values.min()
+                    maximum = values.max()
+
+                    if values.nunique() <= 1:
+                        st.write(
+                            f"**{col}:** This column has no variation "
+                            "in its non-missing values."
+                        )
+                    elif minimum < average * 0.5 and average > 0:
+                        st.write(
+                            f"**{col}:** Some values are substantially "
+                            "below the average. Review the lowest values."
+                        )
+                    elif maximum > average * 2 and average > 0:
+                        st.write(
+                            f"**{col}:** Some values are substantially "
+                            "above the average. Check whether these are "
+                            "expected or unusual."
+                        )
+            else:
+                st.info(
+                    "No numeric columns are available. Review text columns "
+                    "and data quality findings to understand this dataset."
+                )
 
 
   

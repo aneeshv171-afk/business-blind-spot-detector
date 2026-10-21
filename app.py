@@ -369,29 +369,29 @@ if uploaded_file is not None:
                 "Review stock levels and identify items needing attention."
             )
         
-            elif detected_type == "Employee / HR":
-            st.write(
-                "Employee dataset detected. "
-                "Review workforce distribution and numeric measures."
-            )
-            
-            elif detected_type == "Customer / Marketing":
-            st.write(
-                "Customer or marketing dataset detected. "
-                "Review customer patterns and campaign measures."
-            )
-            
-            elif detected_type == "Orders / Operations":
-            st.write(
-                "Orders dataset detected. "
-                "Review order statuses, delivery dates, and pending orders."
-            )
-            
-            else:
-            st.write(
-                "General dataset detected. "
-                "Use the automatic numeric analysis and data quality checks below."
-            )
+        elif detected_type == "Employee / HR":
+        st.write(
+            "Employee dataset detected. "
+            "Review workforce distribution and numeric measures."
+        )
+        
+        elif detected_type == "Customer / Marketing":
+        st.write(
+            "Customer or marketing dataset detected. "
+            "Review customer patterns and campaign measures."
+        )
+        
+        elif detected_type == "Orders / Operations":
+        st.write(
+            "Orders dataset detected. "
+            "Review order statuses, delivery dates, and pending orders."
+        )
+        
+        else:
+        st.write(
+            "General dataset detected. "
+            "Use the automatic numeric analysis and data quality checks below."
+        )
 
 
   

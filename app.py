@@ -352,22 +352,22 @@ if uploaded_file is not None:
         st.subheader("Automatic Business Insights")
         
         
-    if detected_type == "Sales / Revenue":
-        st.write("Sales dataset detected. Checking sales performance.")
-
-        for col in df.select_dtypes(include="number").columns:
-            total = df[col].sum()
-            average = df[col].mean()
-
+        if detected_type == "Sales / Revenue":
+            st.write("Sales dataset detected. Checking sales performance.")
+    
+            for col in df.select_dtypes(include="number").columns:
+                total = df[col].sum()
+                average = df[col].mean()
+    
+                st.write(
+                    f"**{col}** — Total: {total:,.2f} | "
+                    f"Average: {average:,.2f}"
+                )
+        elif detected_type == "Inventory / Stock":
             st.write(
-                f"**{col}** — Total: {total:,.2f} | "
-                f"Average: {average:,.2f}"
+                "Inventory dataset detected. "
+                "Review stock levels and identify items needing attention."
             )
-    elif detected_type == "Inventory / Stock":
-        st.write(
-            "Inventory dataset detected. "
-            "Review stock levels and identify items needing attention."
-        )
         
         elif detected_type == "Employee / HR":
         st.write(
@@ -966,9 +966,9 @@ if uploaded_file is not None:
 
     except (pd.errors.ParserError, UnicodeDecodeError, ValueError) as e:
         st.error(f"Unable to analyse this CSV file: {e}")
-
+    
     except Exception as e:
         st.error(f"Unexpected analysis error: {e}")
 
 else:
-    st.info("Upload a CSV file to begin analysing your business records.")
+st.info("Upload a CSV file to begin analysing your business records.")

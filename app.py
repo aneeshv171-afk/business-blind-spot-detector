@@ -972,5 +972,6 @@ if uploaded_file is not None:
     except Exception as e:
         st.error(f"Unexpected analysis error: {e}")
 
+
 else:
-st.info("Upload a CSV file to begin analysing your business records.")
+    st.info("Upload a CSV file to begin analysing your business records.")
